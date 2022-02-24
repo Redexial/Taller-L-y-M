@@ -31,6 +31,7 @@ TT_RPAREN  = 'RPAREN'
 TT_EQUAL   = 'EQUAL'
 TT_LINE    = 'LINE'
 TT_DOTS    = 'TWO DOTS'
+TT_CODEB = "BLOCK"
 
 class Token:
     def __init__(self, type_, value = None):
@@ -62,32 +63,13 @@ class Lexer:
         tokens = []  
 
         while self.current_char != None:
-            if self.current_char in ' \t':
+            token = self.switch_char(self.current_char)
+            if token:
+                tokens.append(token)
                 self.advance()
-            elif self.current_char in DIGITS:
-                tokens.append(self.make_number())
-            elif self.current_char in ALPHABET:
-                tokens.append(self.make_word())
-            elif self.current_char == '(':
-                tokens.append(Token(TT_LPAREN))
-                self.advance()
-            elif self.current_char == ')':
-                tokens.append(Token(TT_RPAREN))
-                self.advance()
-            elif self.current_char == '=':
-                tokens.append(Token(TT_EQUAL))
-                self.advance()
-            elif self.current_char == '-':
-                tokens.append(Token(TT_LINE))
-                self.advance()
-            elif self.current_char == ':':
-                tokens.append(Token(TT_DOTS))
-                self.advance()
+                pass
             else:
-                char = self.current_char
                 self.advance()
-                return [], IllegalCharError("'"+ char + "'")
-
         return tokens, None
 
 
@@ -98,6 +80,7 @@ class Lexer:
             num_str += self.current_char
             self.advance()
         return Token(TT_INT, int(num_str))
+
     def make_word(self):
         word_str = ''
 
@@ -105,6 +88,39 @@ class Lexer:
             word_str += self.current_char
             self.advance()
         return Token(TT_STRING, word_str)
+    
+    def make_code_block(self):
+        block = []
+        while self.current_char != None and self.current_char != ')':
+            block.append(self.switch_char(self.current_char))
+            if self.current_char == None or self.current_char == ')':
+                break
+            else:
+                self.advance()
+        return Token(TT_CODEB, block)
+
+    def switch_char(self, char):
+        tokens=[]
+        if char in ' \t)':
+            self.advance()
+        elif char in DIGITS:
+            return(self.make_number())
+        elif char in ALPHABET:
+            return(self.make_word())
+        elif char == '(':
+            self.advance()
+            return(self.make_code_block())
+        elif char == '=':
+            return(Token(TT_EQUAL))
+        elif char == '-':
+            return(Token(TT_LINE))
+        elif char == ':':
+            return(Token(TT_DOTS))
+        else:
+            char = char
+            self.advance()
+            raise IllegalCharError("'"+ char + "'")
+        return False
 
 ##############
 #RUN

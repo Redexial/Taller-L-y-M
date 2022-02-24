@@ -1,26 +1,18 @@
 import basic
 file = open('InputValido.txt', 'r')
 text = file.readlines()
-for line in text:
-    line = line.strip()
-    result, error = basic.run(line)
-    if error: print(error.as_string())
-    else: 
-        print(result)   
-        if len(result) != 0:
-            if result[1].type == basic.TT_STRING:
-                if result[2].type == basic.TT_STRING:
-                    print('Sintaxis Valida')
-                else:
-                    print('Sintaxin invalida')
-            
-    
-
-            
-      
-       
-
-
-        
-        
-
+#result, error = basic.run(text.strip())
+#print(text)
+#if error: print(error.as_string())
+#else: 
+#    print(result)
+xyalpha = ''.join([line.strip() for line in text])
+result, error = basic.run(xyalpha)
+for block in result:
+    print(block)
+#for line in text:
+ #   line = line.strip()
+  #  result, error = basic.run(line)
+   # if error: print(error.as_string())
+    #else: 
+     #   print(result)
